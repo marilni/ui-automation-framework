@@ -17,13 +17,15 @@ async function globalSetup() {
   const context = await browser.newContext();
   const page = await context.newPage();
 
-  await page.goto(`${BASE_URL}auth`);
+  const baseUrl = BASE_URL!.replace(/\/$/, '');
+
+  await page.goto(`${baseUrl}/auth`);
 
   await page.getByPlaceholder(/email/i).fill(ADMIN_EMAIL);
   await page.getByPlaceholder(/password/i).fill(ADMIN_PASSWORD);
   await page.getByRole('button', { name: /sign in/i }).click();
 
-  await page.waitForURL(`${BASE_URL}`, { timeout: 15000 });
+  await page.waitForURL(`${baseUrl}/`, { timeout: 15000 });
 
   await context.storageState({ path: AUTH_FILE });
   await browser.close();
