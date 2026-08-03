@@ -14,7 +14,7 @@ async function globalSetup() {
   }
 
   const browser = await chromium.launch({ headless: process.env.HEADLESS !== 'false' });
-  const context = await browser.newContext();
+  const context = await browser.newContext({ viewport: { width: 1280, height: 720 } });
   const page = await context.newPage();
 
   const baseUrl = BASE_URL!.replace(/\/$/, '');
