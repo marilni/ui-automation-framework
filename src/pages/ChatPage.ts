@@ -14,17 +14,21 @@ export class ChatPage {
     this.newChatButton = page.getByRole('link', { name: 'New Chat' }).first();
     this.messageInput = page.locator('#chat-input');
     this.chatContainer = page.locator('#message-input-container');
-    this.welcomeModalDismiss = page.getByRole('button', { name: "Okay, Let's Go!" });
+    this.welcomeModalDismiss = page.getByRole('button', { name: 'Close' });
   }
 
   async goto() {
     await this.page.goto('/');
 
-    if (await this.welcomeModalDismiss.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await this.welcomeModalDismiss.click();
-    }
+    await Promise.race([
+      this.welcomeModalDismiss.waitFor({ state: 'visible' }),
+      this.messageInput.waitFor({ state: 'visible' }),
+    ]);
 
-    await this.messageInput.waitFor({ state: 'visible' });
+    if (await this.welcomeModalDismiss.isVisible()) {
+      await this.welcomeModalDismiss.click();
+      await this.messageInput.waitFor({ state: 'visible' });
+    }
   }
 
   async openNewChat() {
