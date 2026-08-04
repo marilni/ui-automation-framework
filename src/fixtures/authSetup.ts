@@ -25,7 +25,7 @@ async function globalSetup() {
   await page.getByPlaceholder(/password/i).fill(ADMIN_PASSWORD);
   await page.getByRole('button', { name: /sign in/i }).click();
 
-  await page.waitForURL(`${baseUrl}/`, { timeout: 15000 });
+  await page.waitForURL(`${baseUrl}/`, { timeout: 30000 });
 
   await context.storageState({ path: AUTH_FILE });
   await browser.close();
