@@ -23,7 +23,7 @@ async function globalSetup() {
 
   await page.getByPlaceholder(/email/i).fill(ADMIN_EMAIL);
   await page.getByPlaceholder(/password/i).fill(ADMIN_PASSWORD);
-  await page.getByRole('button', { name: /sign in/i }).click();
+  await page.getByPlaceholder(/password/i).press('Enter');
 
   await page.waitForURL(`${baseUrl}/`, { timeout: 30000 });
 
