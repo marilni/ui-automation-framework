@@ -16,7 +16,6 @@ async function globalSetup() {
   const browser = await chromium.launch({ headless: process.env.HEADLESS !== 'false' });
   const context = await browser.newContext({
     viewport: { width: 1280, height: 720 },
-    recordVideo: { dir: 'playwright-report/', size: { width: 1280, height: 720 } },
   });
   const page = await context.newPage();
 
@@ -28,7 +27,7 @@ async function globalSetup() {
   await page.getByPlaceholder(/password/i).fill(ADMIN_PASSWORD);
   await page.getByPlaceholder(/password/i).press('Enter');
 
-  await page.waitForURL(`${baseUrl}/`, { timeout: 30000 }).catch(async () => {
+  await page.waitForURL(`${baseUrl}/**`, { timeout: 30000 }).catch(async () => {
     await page.screenshot({ path: 'playwright-report/auth-failure.png', fullPage: true });
     throw new Error(`Auth failed. Current URL: ${page.url()}`);
   });
