@@ -113,6 +113,21 @@ Screenshots on failure and traces on retry are saved to `test-results/`.
 
 ## CI
 
-- `retries: 2` on CI, `0` locally.
-- `workers: 1` on CI to avoid resource contention.
-- Set `CI=true` in your pipeline to activate both automatically.
+Tests run automatically on push and pull requests to `main` and `develop`.
+
+The pipeline:
+1. Spins up a fresh Open WebUI Docker container on port `3000`
+2. Seeds the admin account via the signup API before any tests run
+3. Runs the full Playwright suite against the live container
+
+Required GitHub Actions secrets:
+
+| Secret | Description |
+|--------|-------------|
+| `ADMIN_EMAIL` | Admin account email |
+| `ADMIN_PASSWORD` | Admin account password |
+
+- `retries: 2` on CI, `0` locally
+- `workers: 2` on CI to match GitHub Actions runner CPU allocation
+- Playwright browser binaries are cached by `package-lock.json` hash to skip re-downloads on unchanged versions
+- Set `CI=true` in your pipeline to activate retry and worker settings automatically

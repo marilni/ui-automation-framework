@@ -1,6 +1,6 @@
 import { test, expect } from '../src/fixtures/chatFixtures';
 
-test.describe('Chat @critical-path @ai-feature', () => {
+test.describe('Chat: Input @critical-path', () => {
 
   test('Input Visible On Load', async ({ chatPage }) => {
     await chatPage.goto();
@@ -9,11 +9,15 @@ test.describe('Chat @critical-path @ai-feature', () => {
     await expect(chatPage.messageInput).toBeVisible();
   });
 
+});
+
+test.describe('Chat: Session @ai-feature', () => {
+
   test('New Session Initialized', async ({ chatPage }) => {
     await chatPage.goto();
     await chatPage.openNewChat();
 
-    expect(await chatPage.isChatInputReady()).toBe(true);
+    await expect(chatPage.messageInput).toBeVisible();
   });
 
 });

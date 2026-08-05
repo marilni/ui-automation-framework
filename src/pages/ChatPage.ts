@@ -35,8 +35,4 @@ export class ChatPage {
     await this.newChatButton.click();
     await this.messageInput.waitFor({ state: 'visible' });
   }
-
-  async isChatInputReady(): Promise<boolean> {
-    return this.messageInput.isVisible();
-  }
 }
