@@ -23,10 +23,14 @@ jobs:
 
     - name: Seed Admin Account
       run: |
-        curl -s -o /dev/null -w "%{http_code}" \
+        STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
           -X POST http://localhost:3000/api/v1/auths/signup \
           -H "Content-Type: application/json" \
-          -d "{\"name\":\"Admin\",\"email\":\"$ADMIN_EMAIL\",\"password\":\"$ADMIN_PASSWORD\"}"
+          -d "{\"name\":\"Admin\",\"email\":\"$ADMIN_EMAIL\",\"password\":\"$ADMIN_PASSWORD\"}")
+        if [ "$STATUS" != "200" ] && [ "$STATUS" != "201" ]; then
+          echo "Admin seed failed with HTTP $STATUS"
+          exit 1
+        fi
       env:
         ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
         ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}

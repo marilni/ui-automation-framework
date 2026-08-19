@@ -27,7 +27,7 @@ async function globalSetup() {
   await page.getByPlaceholder(/password/i).fill(ADMIN_PASSWORD);
   await page.getByPlaceholder(/password/i).press('Enter');
 
-  await page.waitForURL(`${baseUrl}/**`, { timeout: 30000 }).catch(async () => {
+  await page.waitForURL((url) => !url.pathname.includes('/auth'), { timeout: 30000 }).catch(async () => {
     await page.screenshot({ path: 'playwright-report/auth-failure.png', fullPage: true });
     throw new Error(`Auth failed. Current URL: ${page.url()}`);
   });
