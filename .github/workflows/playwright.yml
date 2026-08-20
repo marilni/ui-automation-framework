@@ -1,15 +1,38 @@
 name: Playwright Tests
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main, develop ]
 jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+
+    - name: Install Dependencies
+      run: npm ci
+
+    - name: Cache Playwright Browsers
+      uses: actions/cache@v4
+      id: playwright-cache
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-${{ hashFiles('package-lock.json') }}
+        restore-keys: playwright-
+
+    - name: Install Playwright Browsers
+      if: steps.playwright-cache.outputs.cache-hit != 'true'
+      run: npx playwright install --with-deps
+
+    - name: Install Browser System Dependencies
+      if: steps.playwright-cache.outputs.cache-hit == 'true'
+      run: npx playwright install-deps
 
     - name: Start Open WebUI Container
       run: |
@@ -23,27 +46,25 @@ jobs:
 
     - name: Seed Admin Account
       run: |
-        curl -s -o /dev/null -w "%{http_code}" \
+        STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
           -X POST http://localhost:3000/api/v1/auths/signup \
           -H "Content-Type: application/json" \
-          -d "{\"name\":\"Admin\",\"email\":\"$ADMIN_EMAIL\",\"password\":\"$ADMIN_PASSWORD\"}"
+          -d "{\"name\":\"Admin\",\"email\":\"$ADMIN_EMAIL\",\"password\":\"$ADMIN_PASSWORD\"}")
+        if [ "$STATUS" != "200" ] && [ "$STATUS" != "201" ]; then
+          echo "Admin seed failed with HTTP $STATUS"
+          exit 1
+        fi
       env:
         ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
         ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
 
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-    - name: Install Dependencies
-      run: npm ci
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
     - name: Run Playwright Tests
       run: npx playwright test
       env:
         BASE_URL: http://localhost:3000
         ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
         ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
