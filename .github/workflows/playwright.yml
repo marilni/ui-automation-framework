@@ -39,6 +39,7 @@ jobs:
         docker run -d --name open-webui \
           -p 3000:8080 \
           -e WEBUI_AUTH=true \
+          -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
           ghcr.io/open-webui/open-webui:main
 
     - name: Wait For Open WebUI Readiness
@@ -64,6 +65,7 @@ jobs:
         BASE_URL: http://localhost:3000
         ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
         ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+        LLM_MODEL: gpt-4o
 
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
