@@ -11,6 +11,10 @@ if (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD) {
   throw new Error('ADMIN_EMAIL and ADMIN_PASSWORD must be set in your .env file.');
 }
 
+if (!process.env.LLM_MODEL) {
+  throw new Error('LLM_MODEL is not set. Check your .env file.');
+}
+
 export default defineConfig({
   testDir: './tests',
   globalSetup: './src/fixtures/authSetup',
@@ -35,18 +39,9 @@ export default defineConfig({
 
   projects: [
     {
-      name: 'chromium',
+      name: 'Regression',
       use: { ...devices['Desktop Chrome'] },
-    },
-    {
-      name: 'Critical Path',
-      use: { ...devices['Desktop Chrome'] },
-      grep: /@critical-path/,
-    },
-    {
-      name: 'AI Features',
-      use: { ...devices['Desktop Chrome'] },
-      grep: /@ai-feature/,
+      grep: /@critical-path|@ai-feature/,
     },
   ],
 });

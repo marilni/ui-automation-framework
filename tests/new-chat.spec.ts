@@ -1,4 +1,6 @@
-import { test } from '../src/fixtures/chatFixtures';
+import { test, expect } from '../src/fixtures/chatFixtures';
+
+const MODEL = process.env.LLM_MODEL as string;
 
 test.describe('Chat: Input @critical-path', () => {
 
@@ -15,6 +17,21 @@ test.describe('Chat: Session @ai-feature', () => {
     await chatPage.goto();
     await chatPage.openNewChat();
     await chatPage.assertMessageInputVisible();
+  });
+
+});
+
+test.describe('Chat: Prompt @ai-feature', () => {
+
+  test('API Response Has Content', async ({ apiClient }) => {
+    const response = await apiClient.sendMessage(MODEL, 'Reply with one word: hello');
+    expect(response).toMatch(/\w+/);
+  });
+
+  test('UI Response Rendered After Prompt', async ({ chatPage }) => {
+    await chatPage.goto();
+    await chatPage.submitPrompt('Reply with one word: hello');
+    await chatPage.assertResponseReceived();
   });
 
 });
